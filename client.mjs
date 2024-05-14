@@ -1,4 +1,8 @@
 export class Client {
+  constructor() {
+    this.name = "unknown";
+    this.logined = false;
+  }
   /**
    * Должен возвращать имя пользователя или null
    * если пользователь не залогинен
@@ -6,7 +10,11 @@ export class Client {
    * @return {Promise<string | null>} username
    * */
   async getUser() {
-    throw new Error("Not implemented");
+    if (this.logined) {
+      return "this.name";
+    }
+
+    return null;
   }
 
   /**
@@ -17,7 +25,24 @@ export class Client {
    * @return {Promise<string | null>} username
    * */
   async loginUser(username) {
-    throw new Error("Not implemented");
+    let data = {name: username};
+
+    let resp = await fetch("https://localhost:3000/api/login", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    let respBody = await resp.json();
+    console.log("got resp");
+    console.log(respBody);
+
+    this.name = respBody["name"];
+    this.logined = true;
+    return this.name;
   }
 
   /**
@@ -26,7 +51,14 @@ export class Client {
    * @return {void}
    * */
   async logoutUser() {
-    throw new Error("Not implemented");
+    let data = {username: "username"};
+
+    let resp = await fetch("https://localhost:3000/api/unlogin", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+    this.logined = false;
+    console.log(resp);
   }
 
   /**
