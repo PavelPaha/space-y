@@ -1,8 +1,4 @@
 export class Client {
-  constructor() {
-    this.name = "unknown";
-    this.logined = false;
-  }
   /**
    * Должен возвращать имя пользователя или null
    * если пользователь не залогинен
@@ -10,11 +6,9 @@ export class Client {
    * @return {Promise<string | null>} username
    * */
   async getUser() {
-    if (this.logined) {
-      return "this.name";
-    }
-
-    return null;
+    const resp = await fetch('/api/getUser');
+    const body = await resp.json();
+    return body.user;
   }
 
   /**
@@ -25,24 +19,15 @@ export class Client {
    * @return {Promise<string | null>} username
    * */
   async loginUser(username) {
-    let data = {name: username};
-
-    let resp = await fetch("https://localhost:3000/api/login", {
-      method: "POST",
+    const resp = await fetch('/api/loginUser', {
+      method: 'POST',
       headers: {
-        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({user: username}),
     });
-
-    let respBody = await resp.json();
-    console.log("got resp");
-    console.log(respBody);
-
-    this.name = respBody["name"];
-    this.logined = true;
-    return this.name;
+    const respJson = await resp.json();
+    return respJson.user;
   }
 
   /**
@@ -51,14 +36,10 @@ export class Client {
    * @return {void}
    * */
   async logoutUser() {
-    let data = {username: "username"};
-
-    let resp = await fetch("https://localhost:3000/api/unlogin", {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
-    this.logined = false;
-    console.log(resp);
+    return fetch(
+        '/api/logoutUser', {
+          method: 'POST'
+        });
   }
 
   /**
@@ -82,7 +63,21 @@ export class Client {
    * @return {Promise<About>}
    * */
   async getInfo() {
-    throw new Error("Not implemented");
+    const result = await fetch('api/about');
+
+    const json = await result.json();
+
+    return {
+      founder: json['founder'],
+      founded: json['founded'],
+      employees: json['employees'],
+      ceo: json['ceo'],
+      coo: json['coo'],
+      cto: json['cto'],
+      valuation: json['valuation'],
+      headquarters: json['headquarters'],
+      summary: json['summary'],
+    }
   }
 
   /**
@@ -95,7 +90,8 @@ export class Client {
    * @return {Promise<EventBrief[]>}
    * */
   async getHistory() {
-    throw new Error("Not implemented");
+    const res = await fetch("/api/history");
+    return res.json();
   }
 
   /**
@@ -112,7 +108,8 @@ export class Client {
    * @return {Promise<EventFull>}
    * */
   async getHistoryEvent(id) {
-    throw new Error("Not implemented");
+    const res = await fetch(`/api/history/${id}`);
+    return res.json();
   }
 
   /**
@@ -125,7 +122,8 @@ export class Client {
    * @return {Promise<RocketBrief[]>}
    * */
   async getRockets() {
-    throw new Error("Not implemented");
+    const res = await fetch("/api/rockets/");
+    return res.json();
   }
 
   /**
@@ -150,7 +148,8 @@ export class Client {
    * @return {Promise<RocketFull>}
    * */
   async getRocket(id) {
-    throw new Error("Not implemented");
+    const res = await fetch(`/api/rockets/${id}`);
+    return res.json();
   }
 
   /**
@@ -167,7 +166,8 @@ export class Client {
    * @return {Promise<Roadster>}
    * */
   async getRoadster() {
-    throw new Error("Not implemented");
+    const res = await fetch("/api/roadster/");
+    return res.json();
   }
 
   /**
